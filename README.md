@@ -1,5 +1,9 @@
 # Hermes Local Hands
 
+[![CI](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/ci.yml/badge.svg)](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml/badge.svg)](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml)
+[![PyPI](https://img.shields.io/pypi/v/hermes-local-hands.svg)](https://pypi.org/project/hermes-local-hands/)
+
 Hermes Local Hands is an **alpha** local companion for a remote
 [Hermes](https://github.com/NousResearch/hermes-agent) agent. It gives that
 agent a deliberately narrow view of one registered repository, while the
@@ -52,15 +56,27 @@ for requests and operator decisions.
 
 ## Install and local-only quickstart
 
-Requirements: Python 3.11+ and Git. Run these commands from a checkout of this
-repository. The example uses `demo` and only exposes `src` and `tests`; replace
-the absolute path and allowlist with your own deliberate choices.
+Requirements: Python 3.11+ and Git. Install the isolated command with
+[uv](https://docs.astral.sh/uv/) or pipx:
+
+```bash
+uv tool install hermes-local-hands
+# Alternative: pipx install hermes-local-hands
+```
+
+For development from a source checkout instead:
 
 ```bash
 # Use a Python 3.11+ executable; macOS /usr/bin/python3 may still be too old.
 python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
+```
+
+The example below uses `demo` and only exposes `src` and `tests`; replace the
+absolute path and allowlist with your own deliberate choices.
+
+```bash
 
 # Creates private local state and a bearer credential file (mode 0600).
 hermes-local-hands init --client-id hermes-mac-studio
@@ -190,6 +206,15 @@ The two inspection tools advertise the MCP `readOnlyHint`. Hermes versions and
 clients may still apply their own approval or policy gate to those tools; the
 hint is useful metadata, not a compatibility guarantee or a bypass.
 
+Hermes releases affected by upstream issue
+[#88858](https://github.com/NousResearch/hermes-agent/issues/88858) may still
+prompt for every read-only call while `trust: untrusted` is configured. That is
+a fail-closed Hermes client behaviour, not additional Local Hands authority.
+The upstream fix is tracked in
+[#88372](https://github.com/NousResearch/hermes-agent/pull/88372). Keep the
+generated `untrusted` setting unless you have reviewed the implications of
+changing the client-side trust policy.
+
 For a reverse proxy, bind Local Hands only to loopback and name every permitted
 external Host exactly:
 
@@ -262,18 +287,23 @@ python -m twine check dist/*
 ```
 
 CI additionally installs the built wheel into a clean environment. These are
-release checks for the package, not proof of a two-host deployment, an active
-Hermes installation, or a safe production rollout.
+release checks for the package, not proof of a safe production rollout.
 
-## Honest commercial path
+On 2026-09-07 one real two-machine alpha flow was completed using Hermes on one
+Mac, this service on another Mac, and HTTPS over a private Tailscale network.
+The run covered unauthenticated rejection, status and file reads, a pending
+patch, local approval, snapshot application, a linked check, and receipt-chain
+verification. This is evidence for that exact environment only; it is not a
+general compatibility, availability, or production-security claim.
+
+For a durable local service setup, see [docs/SERVICE.md](docs/SERVICE.md).
+
+## Project direction
 
 The security core is intended to remain free and open source. There is no paid
-plan, hosted service, customer, revenue, or pricing validation today. The only
-possible paid directions are hypotheses: guided secure setup at **149 EUR**,
-an individual Pro tier at **9–15 EUR/month**, and a Team tier at
-**49–99 EUR/month**. The 30-day evidence gates are in
-[docs/COMMERCIAL_PATH.md](docs/COMMERCIAL_PATH.md); if they are not met, the
-right result is to change direction rather than add billing.
+plan, hosted service, customer, or revenue today. Adoption and safety come
+before any optional convenience layer. See [ROADMAP.md](ROADMAP.md) for the
+public, evidence-gated direction.
 
 ## Contributing and security
 
@@ -285,3 +315,6 @@ request.
 ## License
 
 Released under the [MIT License](LICENSE).
+
+Hermes Local Hands is an independent community project and is not affiliated
+with or endorsed by Nous Research.

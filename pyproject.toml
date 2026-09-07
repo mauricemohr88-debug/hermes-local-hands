@@ -28,6 +28,12 @@ dependencies = [
   "uvicorn>=0.35,<1",
 ]
 
+[project.urls]
+Homepage = "https://github.com/mauricemohr88-debug/hermes-local-hands"
+Documentation = "https://github.com/mauricemohr88-debug/hermes-local-hands#readme"
+Issues = "https://github.com/mauricemohr88-debug/hermes-local-hands/issues"
+Source = "https://github.com/mauricemohr88-debug/hermes-local-hands"
+
 [project.optional-dependencies]
 dev = [
   "build>=1.2,<2",

@@ -145,7 +145,8 @@ def test_official_mcp_server_and_loopback_guard():
     service, directory = _service()
     try:
         server = build_mcp_server(service)
-        names = {tool.name for tool in server._tool_manager._tools.values()}
+        tools = {tool.name: tool for tool in server._tool_manager._tools.values()}
+        names = set(tools)
         assert names == {
             "workspace_status",
             "read_file",
@@ -153,6 +154,13 @@ def test_official_mcp_server_and_loopback_guard():
             "request_check",
             "request_status",
         }
+        for name in ("workspace_status", "read_file", "request_status"):
+            annotations = tools[name].annotations
+            assert annotations is not None
+            assert annotations.read_only_hint is True
+            assert annotations.destructive_hint is False
+        assert tools["propose_patch"].annotations is None
+        assert tools["request_check"].annotations is None
         assert require_loopback("127.0.0.1") == "127.0.0.1"
         assert require_loopback("::1") == "::1"
         for unsupported_host in ("localhost", "0.0.0.0"):

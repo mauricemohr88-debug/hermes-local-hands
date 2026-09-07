@@ -20,9 +20,11 @@ Initial alpha release candidate:
   and explicit incomplete-deletion visibility;
 - signed receipt chain and local verification command;
 - source/build/test/package validation automation.
+- one real two-machine alpha validation over tailnet HTTPS, covering remote
+  status/read, a pending patch, local approval, snapshot execution, a linked
+  check, and receipt verification.
 
 This version is not a sandbox. Approved checks run trusted repository code with
 the local user's normal host and network access and can cause host-side effects.
 Its post-check source observation covers Git-visible checkout status only. It
-has not yet established real two-host Hermes/tunnel compatibility or production
-readiness.
+has not established broad Hermes/tunnel compatibility or production readiness.
