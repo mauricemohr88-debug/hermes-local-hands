@@ -22,7 +22,9 @@ merge, or push.
 > Hands applies patches and launches checks from an isolated snapshot rather
 > than writing the registered checkout itself. Approved check code still has
 > the local user's normal host and network access and can deliberately modify
-> the registered checkout; this is **not** a sandbox.
+> the registered checkout; this is **not** a sandbox. Check stdout/stderr stays
+> local: remote `request_status` returns bounded execution metadata, never the
+> captured output.
 
 ## Why this now
 
@@ -88,6 +90,7 @@ hermes-local-hands workspace add \
   --read src \
   --read tests \
   --write src \
+  --write tests \
   --check syntax=/usr/bin/python3,-m,compileall,-q,src \
   --client hermes-mac-studio
 
@@ -143,9 +146,11 @@ public configuration file.
 
 6. An approved operation is revalidated against the recorded `HEAD` and policy,
    then Local Hands applies or launches it from a managed snapshot. Approved
-   check code is still host-capable. Inspect the result with
-   `hermes-local-hands request status <request-id>` and verify the receipt chain
-   locally with `hermes-local-hands receipt-verify`.
+   check code is still host-capable. Inspect its full output locally with
+   `hermes-local-hands request status <request-id>`. Remote `request_status`
+   exposes only structured execution metadata such as exit state, output size,
+   and output digest. Verify the receipt chain locally with
+   `hermes-local-hands receipt-verify`.
 
 7. After reviewing a succeeded or failed snapshot, free its retention slot only
    through the exact-ID local deletion gate:
@@ -244,6 +249,11 @@ public Internet.
   but the selected program still runs as the local user. It can access that
   user's files, network, credentials, services, and can cause host-side
   effects. Only approve profiles and repositories you trust.
+- **Check output is local-only:** stdout/stderr is retained for local review but
+  omitted from the remote request view. The remote client receives bounded
+  metadata and a digest, closing the direct output-content channel through
+  `request_status`. Approved code is still not sandboxed and can influence
+  metadata or communicate through its normal host and network access.
 - **Checkout observation is limited:** after a check, Local Hands compares only
   Git-visible checkout status before and after. `same` does not prove that no
   non-Git file, service, network, credential, or other host-side effect

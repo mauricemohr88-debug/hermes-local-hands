@@ -42,6 +42,10 @@ guarantee that every configuration can be supported.
   or profiles on a machine containing sensitive material. Such code can cause
   host-side effects; a post-check `same` observation compares Git-visible
   checkout status only and is not proof that no other effect occurred.
+- Captured check stdout/stderr is local-only. Remote `request_status` receives
+  bounded execution metadata and a digest, not the output text. This closes the
+  direct output-content channel; it does not sandbox approved code or prevent
+  it from influencing metadata or using its normal network access.
 - Receipts form signed local audit evidence for the retained chain. With no
   externally anchored head, verification cannot detect a deleted valid tail,
   an empty replacement database, or rollback to an earlier valid copy. They

@@ -55,6 +55,38 @@ _SECRET_ASSIGNMENT = re.compile(
     r"(?i)\b(password|passwd|secret|token|api[_-]?key|access[_-]?key)\s*[:=]\s*([^\s,;]+)"
 )
 _PRIVATE_KEY = re.compile(r"-----BEGIN [^-\r\n]*PRIVATE KEY-----")
+_PUBLIC_FAILURE_RESULT_FIELDS = frozenset({"code", "detail_sha256", "summary"})
+_PUBLIC_PATCH_RESULT_FIELDS = (
+    frozenset(
+        {
+            "affected_paths",
+            "changed_lines",
+            "patch_sha256",
+            "snapshot_id",
+        }
+    )
+    | _PUBLIC_FAILURE_RESULT_FIELDS
+)
+_PUBLIC_TEST_RESULT_FIELDS = (
+    frozenset(
+        {
+            "exit_code",
+            "output_bytes",
+            "output_sha256",
+            "output_truncated",
+            "passed",
+            "patch_request_id",
+            "patch_sha256",
+            "process_cleanup_guaranteed",
+            "process_group_kill_attempted",
+            "snapshot_id",
+            "source_status_observation",
+            "temporary_home_removed",
+            "timed_out",
+        }
+    )
+    | _PUBLIC_FAILURE_RESULT_FIELDS
+)
 
 
 def _now() -> str:
@@ -745,7 +777,7 @@ class LocalHandsService:
         }
 
     def public_request(self, request_id: str, client_id: str) -> dict[str, Any]:
-        """Return the owning client a useful result without patch contents or local paths."""
+        """Return the owning client metadata without patches or check output."""
         self._expire_due()
         request = self.store.request(request_id, client_id=client_id)
         if request.kind is RequestKind.PATCH:
@@ -761,6 +793,16 @@ class LocalHandsService:
                 for key in ("profile", "timeout_seconds", "patch_request_id")
                 if key in request.payload
             }
+        public_result = None
+        if request.result is not None:
+            allowed_result_fields = (
+                _PUBLIC_PATCH_RESULT_FIELDS
+                if request.kind is RequestKind.PATCH
+                else _PUBLIC_TEST_RESULT_FIELDS
+            )
+            public_result = {
+                key: request.result[key] for key in allowed_result_fields if key in request.result
+            }
         return {
             "request_id": request.request_id,
             "kind": request.kind.value,
@@ -771,7 +813,7 @@ class LocalHandsService:
             "base_head": request.base_head,
             "policy_hash": request.policy_hash,
             "request": request_details,
-            "result": request.result,
+            "result": public_result,
         }
 
     def reject(self, request_id: str, reason: str = "rejected locally") -> None:

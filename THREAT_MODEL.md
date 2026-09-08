@@ -52,6 +52,7 @@ The security invariant is:
 | Process crash mid-execution | Execution becomes `uncertain` for local review; it is never silently success | A process may have had external effects before interruption |
 | Approved execution modifies active checkout | Local Hands writes only its managed snapshot and records a before/after Git-status observation | Approved check code is not confined and can still modify the checkout or host |
 | Test profile compromises the host | Profiles are fixed locally and approval is explicit | **Not sandboxed:** trusted repo code gets normal user/network access and can cause host-side effects |
+| Test profile prints host data | Captured stdout/stderr is available only through the local operator view; remote status exposes metadata and a digest | Approved code can still influence metadata or communicate through its normal host/network access; the local operator can view and copy output |
 | Check reports source checkout unchanged | Before/after Git status is recorded | It observes Git-visible checkout changes only; other local/host effects can still occur |
 | Public HTTP exposure or DNS rebinding | Literal loopback bind; exact proxy host allowlist; HTTPS endpoint generator | A misconfigured tunnel/proxy can still expose the service |
 | Receipt edits/reordering inside the retained chain | Signed receipt chain with previous-hash links | With no external head anchor, valid tail deletion, empty-ledger replacement, or rollback is not detectable; a compromised local user/key can forge future receipts |
@@ -113,7 +114,8 @@ Before each rollout, the operator should:
 2. Keep the listener on loopback; authenticate and encrypt the tunnel.
 3. Use a small read/write allowlist and fixed checks whose commands are known.
 4. Read a pending patch or check request before local approval.
-5. Treat test output as untrusted data; do not copy credentials into it.
+5. Treat locally displayed test output as untrusted data; do not copy
+   credentials into it or forward it to the remote client without review.
 6. Inspect `uncertain` operations manually and create a new request instead of
    retrying blindly.
 7. Verify the receipt chain after an important review period.

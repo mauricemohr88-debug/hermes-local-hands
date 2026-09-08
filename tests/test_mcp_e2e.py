@@ -161,6 +161,20 @@ async def _exercise_mcp(tmp_path: Path) -> None:
                         "profile": "smoke",
                         "timeout_seconds": 120,
                     }
+                    check_request_id = check.structured_content["request_id"]
+                    service.approve(
+                        check_request_id,
+                        service.approval_code(check_request_id),
+                    )
+                    check_status = await session.call_tool(
+                        "request_status", {"request_id": check_request_id}
+                    )
+                    assert check_status.is_error is False
+                    assert check_status.structured_content is not None
+                    assert check_status.structured_content["result"]["passed"] is True
+                    assert "output" not in check_status.structured_content["result"]
+                    assert "output_excerpt" not in check_status.structured_content["result"]
+                    assert "mcp check" not in str(check_status.structured_content)
     finally:
         server.should_exit = True
         await serve_task

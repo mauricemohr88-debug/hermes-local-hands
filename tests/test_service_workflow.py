@@ -171,6 +171,48 @@ def test_timeout_and_output_limit_are_failed_check_states(workflow, monkeypatch)
     assert clipped["output_truncated"] is True
 
 
+def test_check_output_is_local_only_even_when_it_contains_non_secret_host_content(workflow):
+    service, root = workflow
+    current, _ = service.store.workspace("demo")
+    service.register_workspace(
+        WorkspacePolicy(
+            "demo",
+            str(root),
+            ("src",),
+            {
+                **current.test_profiles,
+                "prints-outside-read-allowlist": (
+                    sys.executable,
+                    "-c",
+                    "from pathlib import Path; print(Path('README.md').read_text())",
+                ),
+            },
+            write_allowlist=("src",),
+        ),
+        client_ids=("hermes",),
+    )
+
+    request = service.request_test(
+        "demo",
+        "prints-outside-read-allowlist",
+        "local-only-output",
+        client_id="hermes",
+    )
+    approved = approve(service, request.request_id)
+    local = service.local_request_view(request.request_id)
+    remote = service.public_request(request.request_id, "hermes")
+
+    assert approved["state"] == "succeeded"
+    assert "private docs" in approved["output"]
+    assert "private docs" in local["result"]["output"]
+    assert "private docs" not in json.dumps(remote)
+    assert "output" not in remote["result"]
+    assert "output_excerpt" not in remote["result"]
+    assert remote["result"]["passed"] is True
+    assert remote["result"]["output_bytes"] > 0
+    assert len(remote["result"]["output_sha256"]) == 64
+
+
 def test_internal_failure_after_check_start_is_recorded_as_uncertain(workflow, monkeypatch):
     service, _ = workflow
     request = service.request_test("demo", "value-is-good", "uncertain-check", client_id="hermes")
@@ -186,7 +228,10 @@ def test_internal_failure_after_check_start_is_recorded_as_uncertain(workflow, m
     assert loaded.state is RequestState.UNCERTAIN
     assert loaded.result is not None
     assert loaded.result["code"] == "execution_outcome_uncertain"
-    assert service.public_request(request.request_id, "hermes")["state"] == "uncertain"
+    remote = service.public_request(request.request_id, "hermes")
+    assert remote["state"] == "uncertain"
+    assert remote["result"]["code"] == "execution_outcome_uncertain"
+    assert len(remote["result"]["detail_sha256"]) == 64
     assert str(service.store.receipts()[-1]["event"]) == "request.uncertain"
     assert service.list_snapshots() == [
         {"request_id": request.request_id, "request_state": "uncertain"}

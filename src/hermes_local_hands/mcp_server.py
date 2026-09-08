@@ -275,7 +275,7 @@ def build_mcp_server(service: LocalHandsService) -> Any:
         "hermes-local-hands",
         title="Hermes Local Hands",
         description="Consent-gated local workspace companion. Approval is local-only.",
-        version="0.1.0",
+        version="0.1.1",
     )
 
     @server.tool(

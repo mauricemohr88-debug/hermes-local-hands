@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+- No changes yet.
+
+## 0.1.1 - 2026-09-08
+
+- keep captured check stdout/stderr local while exposing only bounded execution
+  metadata and a digest through remote `request_status`;
+- grant `tests` write access in the quickstart so proposed implementation and
+  proof changes can be reviewed together;
 - No stable protocol, production-security claim, hosted service, or compatibility
   guarantee is made until a release explicitly says otherwise.
 
