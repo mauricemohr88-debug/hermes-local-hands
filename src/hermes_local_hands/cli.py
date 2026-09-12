@@ -10,15 +10,14 @@ import sys
 from collections.abc import Sequence
 from dataclasses import asdict, is_dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .errors import LocalHandsError
 from .hermes_config import render_hermes_config
-from .mcp_server import create_mcp_app, require_loopback
 from .models import RequestState, WorkspacePolicy
-from .receipts import ReceiptLedger
-from .service import LocalHandsService
-from .storage import Store
+
+if TYPE_CHECKING:
+    from .service import LocalHandsService
 
 
 def default_state_dir() -> Path:
@@ -31,6 +30,10 @@ def default_state_dir() -> Path:
 
 
 def build_service(state_dir: str | Path | None = None) -> LocalHandsService:
+    from .receipts import ReceiptLedger
+    from .service import LocalHandsService
+    from .storage import Store
+
     state = Path(state_dir) if state_dir is not None else default_state_dir()
     state.mkdir(parents=True, exist_ok=True, mode=0o700)
     store = Store(str(state / "hands.sqlite3"))
@@ -226,6 +229,15 @@ def parser() -> argparse.ArgumentParser:
         "--state-dir", help="private state directory; defaults to the OS state directory"
     )
     commands = root.add_subparsers(dest="command", required=True)
+    doctor = commands.add_parser("doctor", help="read-only setup and connection diagnostics")
+    doctor.add_argument("--workspace", help="check one registered workspace")
+    doctor.add_argument("--client", help="check one client and its workspace grant")
+    doctor.add_argument("--endpoint", help="optionally probe an explicit MCP HTTP(S) endpoint")
+    doctor.add_argument("--json", action="store_true", dest="as_json")
+    demo = commands.add_parser("demo", help="try local approval with an isolated toy repository")
+    demo.add_argument(
+        "--directory", type=Path, help="new directory; default: private temp directory"
+    )
     commands.add_parser("init").add_argument("--client-id", default="hermes")
     client = commands.add_parser("client").add_subparsers(dest="client_command", required=True)
     add = client.add_parser("add")
@@ -329,6 +341,42 @@ def run(argv: Sequence[str] | None = None, *, service: LocalHandsService | None 
     args = parser().parse_args(argv)
     state_dir = Path(args.state_dir) if args.state_dir else default_state_dir()
     try:
+        if args.command == "doctor":
+            from .doctor import doctor_report
+
+            report = doctor_report(
+                state_dir,
+                workspace_id=args.workspace,
+                client_id=args.client,
+                endpoint=args.endpoint,
+            )
+            if args.as_json:
+                _emit(report)
+            else:
+                print("Hermes Local Hands - SETUP DIAGNOSTICS")
+                for check in report["checks"]:
+                    print(f"[{check['status'].upper()}] {check['message']}")
+                    if check.get("hint"):
+                        print(f"  Next: {check['hint']}")
+                print(
+                    "Diagnostics complete. Warnings and skipped checks are not verified readiness."
+                )
+            return 0 if report["ok"] else 1
+        if args.command == "demo":
+            if args.state_dir or service is not None:
+                raise LocalHandsError("demo uses its own new state; omit --state-dir")
+            from .demo import run_demo
+
+            return run_demo(args.directory, review_request=_emit_request_review)
+        if args.command == "hermes-config":
+            print(
+                render_hermes_config(
+                    endpoint=args.endpoint or f"http://127.0.0.1:{args.port}/mcp",
+                    token_env=args.token_env,
+                ),
+                end="",
+            )
+            return 0
         service = service or build_service(state_dir)
         exit_status = 0
         if args.command == "init":
@@ -467,15 +515,9 @@ def run(argv: Sequence[str] | None = None, *, service: LocalHandsService | None 
                 _emit({"request_id": args.request_id, "deleted": True})
         elif args.command == "receipt-verify":
             _emit(_verify_receipts(service))
-        elif args.command == "hermes-config":
-            print(
-                render_hermes_config(
-                    endpoint=args.endpoint or f"http://127.0.0.1:{args.port}/mcp",
-                    token_env=args.token_env,
-                ),
-                end="",
-            )
         elif args.command == "serve":
+            from .mcp_server import create_mcp_app, require_loopback
+
             require_loopback(args.host)
             service.recover_interrupted()
             try:
