@@ -4,17 +4,20 @@
 [![CodeQL](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml/badge.svg)](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml)
 [![PyPI](https://img.shields.io/pypi/v/hermes-local-hands.svg)](https://pypi.org/project/hermes-local-hands/)
 
-Hermes Local Hands is an **alpha** local companion for a remote
-[Hermes](https://github.com/NousResearch/hermes-agent) agent. It gives that
-agent a deliberately narrow view of one registered repository, while the
-computer that owns the repository retains the final say over every change and
-check.
+**Hermes runs on one computer. Your repository stays on another. You approve
+changes where the code lives.**
 
-It solves a concrete split-machine problem: Hermes can reason on a Mac Studio,
-server, or VM, while the developer's source code remains on a different local
-machine. The remote side can inspect approved files and create requests. It
-cannot run a shell, approve or deny a request, write the active checkout,
-merge, or push.
+Hermes Local Hands is an **alpha**, free, open-source companion for a remote
+[Hermes](https://github.com/NousResearch/hermes-agent) agent. For example, Hermes
+on your server can read an allowlisted source file on your laptop, propose a
+small fix, and request a named check. You inspect and approve each request
+locally. Local Hands applies the patch and runs the approved check in snapshots;
+it does not merge the result into your working checkout.
+
+Use it when the agent and repository live on different machines and you want a
+specific read/request boundary. It is not another Hermes runtime, a general
+remote shell, or an autonomous deployment service. The remote protocol cannot
+approve requests, write the active checkout, merge, or push.
 
 > **Security boundary in v0.1.** `workspace_status` and `read_file` are remote
 > inspection tools. `propose_patch` and `request_check` only create a pending,
@@ -26,15 +29,41 @@ merge, or push.
 > local: remote `request_status` returns bounded execution metadata, never the
 > captured output.
 
-## Why this now
+## Try the workflow before connecting a real repository
 
-The architecture follows real upstream demand for safer local execution and
-split-runtime workflows, rather than adding a second Hermes runtime. Useful
-primary context is the upstream discussions [#18715](https://github.com/NousResearch/hermes-agent/issues/18715),
-[#42807](https://github.com/NousResearch/hermes-agent/issues/42807), and
-[#16462](https://github.com/NousResearch/hermes-agent/issues/16462), plus the
-related implementation work in [#63966](https://github.com/NousResearch/hermes-agent/pull/63966)
-and [#43045](https://github.com/NousResearch/hermes-agent/pull/43045).
+The `demo` and `doctor` commands require **0.2.0 or newer**. For an isolated
+installation, use `uv tool install 'hermes-local-hands>=0.2.0'`, then run
+`hermes-local-hands demo`. For development from this checkout:
+Requirements: macOS or Linux, Python 3.11+, Git, and an interactive terminal.
+
+```bash
+cd /path/to/hermes-local-hands
+python3.11 -m venv .venv
+.venv/bin/python -m pip install --upgrade pip setuptools
+.venv/bin/python -m pip install -e .
+.venv/bin/hermes-local-hands demo
+```
+
+Installation may download dependencies. The demo itself needs no network,
+Hermes instance, tunnel, account, or real repository. It creates its own tiny Git
+repository and private state, shows a pending patch, and asks you to enter that
+request's approval code. A linked check needs a second, separate approval. You
+can skip or abort; piped/noninteractive input is refused, never auto-approved.
+
+The demo keeps its generated files for inspection and prints their directory.
+This is a local example of request → review → snapshot result, **not a
+two-machine test or a sandbox**. Follow the [short walkthrough](docs/TRY_IT.md)
+for what to inspect, read-only diagnostics, and the separate two-machine setup.
+
+![Recorded CLI output of the local toy demo: separate patch and check approvals, followed by a snapshot result](docs/assets/local-demo.gif)
+
+This is an actual recording captured during development of 0.2.0; its
+pre-release label describes when it was recorded. The
+fixture-only recorder entered the two displayed toy codes; ordinary demo use
+remains manual. The generated directory path is redacted. Download the
+[cast](docs/assets/local-demo.cast) or open the self-contained
+[replay page](docs/demo.html) locally for the full transcript and timing. The GIF
+holds its final frame briefly for readability; no remote connection was tested.
 
 ## What it does — and does not do
 
@@ -56,7 +85,16 @@ Interrupted execution is recorded as **uncertain**, not silently reported as a
 success. The local state store also writes a signed, append-only receipt chain
 for requests and operator decisions.
 
-## Install and local-only quickstart
+<a id="install-and-local-only-quickstart"></a>
+
+## Connect a real repository
+
+Complete the [local demo](docs/TRY_IT.md#1-run-the-local-demo) first if the
+approval/snapshot distinction is new to you. Only register a repository and
+check profiles you trust: approved check code has your normal host and network
+access. Start with a non-sensitive test repository, not production code.
+
+### Install the released CLI
 
 Requirements: Python 3.11+ and Git. Install the isolated command with
 [uv](https://docs.astral.sh/uv/) or pipx:
@@ -66,20 +104,21 @@ uv tool install hermes-local-hands
 # Alternative: pipx install hermes-local-hands
 ```
 
-For development from a source checkout instead:
+For development from a source checkout, use the setup above and install the
+additional development tools when needed:
 
 ```bash
-# Use a Python 3.11+ executable; macOS /usr/bin/python3 may still be too old.
-python3.11 -m venv .venv
 source .venv/bin/activate
 python -m pip install -e '.[dev]'
 ```
 
-The example below uses `demo` and only exposes `src` and `tests`; replace the
-absolute path and allowlist with your own deliberate choices.
+The example below registers a real workspace named `demo`; this is separate
+from the generated `demo` command above. It only exposes `src` and `tests`.
+Replace the absolute path, check executable, and allowlists with deliberate
+choices for your own repository. When using a source checkout without an
+activated environment, invoke `.venv/bin/hermes-local-hands` instead.
 
 ```bash
-
 # Creates private local state and a bearer credential file (mode 0600).
 hermes-local-hands init --client-id hermes-mac-studio
 
@@ -110,6 +149,16 @@ export HERMES_LOCAL_HANDS_TOKEN="$(< "$HOME/.local/state/hermes-local-hands/clie
 
 Do not put a real token in a repository, issue, screenshot, shell history, or
 public configuration file.
+
+Source-checkout users can inspect setup without changing it:
+
+```bash
+.venv/bin/hermes-local-hands doctor --workspace demo --client hermes-mac-studio
+```
+
+Diagnostics do not initialize or repair state, approve requests, execute check
+profiles, or prove a remote Hermes connection. See the
+[diagnostic examples](docs/TRY_IT.md#2-check-your-local-setup-read-only).
 
 ### End-to-end workflow
 
@@ -310,10 +359,32 @@ For a durable local service setup, see [docs/SERVICE.md](docs/SERVICE.md).
 
 ## Project direction
 
-The security core is intended to remain free and open source. There is no paid
-plan, hosted service, customer, or revenue today. Adoption and safety come
-before any optional convenience layer. See [ROADMAP.md](ROADMAP.md) for the
-public, evidence-gated direction.
+The complete local security core stays free and open source. This project does
+not offer a paid plan or hosted service; tester adoption, paying customers, and
+revenue must not be inferred from a release or a successful local demo.
+
+We are looking for **two independent split-machine testers**. Try one small,
+non-sensitive workflow and report the first confusing step using the
+[feedback template](docs/TRY_IT.md#4-report-what-actually-happened). No call,
+payment, or private repository upload is needed. A failed setup is useful
+feedback too; the invitation is not evidence that two testers have completed it.
+
+Only actual, repeated use should justify an optional convenience layer, such as
+a local approval inbox or later H3rm35 mobile approval support. H3rm35 is a
+separate project, not a requirement or a completed integration. See
+[ROADMAP.md](ROADMAP.md) for the evidence gates.
+
+### Related upstream context
+
+Related upstream discussions include
+[#18715](https://github.com/NousResearch/hermes-agent/issues/18715),
+[#42807](https://github.com/NousResearch/hermes-agent/issues/42807), and
+[#16462](https://github.com/NousResearch/hermes-agent/issues/16462), with related
+implementation work in
+[#63966](https://github.com/NousResearch/hermes-agent/pull/63966) and
+[#43045](https://github.com/NousResearch/hermes-agent/pull/43045). These links
+provide context, not a claim about their current status or endorsement of Local
+Hands.
 
 ## Contributing and security
 

@@ -1,8 +1,24 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 - 2026-09-12
 
-- No changes yet.
+- Add a `demo` command with a generated toy Git repository and
+  private state, separate manual patch/check approvals, no Hermes or network
+  requirement, and retained artifacts for inspection. Noninteractive input
+  cannot approve requests.
+- Add read-only `doctor` diagnostics with optional workspace, client, endpoint,
+  and JSON output; diagnostics do not initialize or repair state or execute
+  requested checks. Only an explicit endpoint enables a bounded unauthenticated
+  reachability probe; live SQLite journals cause dependent checks to be skipped.
+- Put a concrete split-machine use case, local demo walkthrough, and separate
+  two-machine tester path at the start of the documentation. Keep local
+  approval, host-capable check execution, and evidence limits explicit.
+- Include a real toy-demo CLI recording, self-contained replay, and a narrowly
+  scoped fixture-only recorder. Recording automation is not a noninteractive
+  approval feature of the CLI, and no remote connection is claimed.
+
+These commands are new in 0.2.0. The remote protocol and local-only approval
+boundary are unchanged; this remains alpha software, not an OS sandbox.
 
 ## 0.1.1 - 2026-09-08
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width">
+<title>Local toy demo; recorded CLI output (unreleased source checkout)</title>
+<style>
+:root{color-scheme:dark;font:16px system-ui;background:#101822;color:#e5edf6}
+body{max-width:1080px;margin:48px auto;padding:0 24px}h1{font-size:clamp(24px,4vw,36px)}
+p{line-height:1.6;color:#afbed0}a{color:#77d4bd}button{background:#77d4bd;color:#10251d;
+border:0;border-radius:8px;padding:12px 20px;font:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid white}
+pre{height:520px;overflow:auto;background:#080e15;padding:24px;border:1px solid #263a4b;
+border-radius:12px;font:14px/1.5 ui-monospace,monospace;
+white-space:pre-wrap;overflow-wrap:anywhere}
+.label{color:#77d4bd;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+</style>
+<main><div class="label">Recorded CLI output · local toy demo · unreleased</div>
+<h1>A request is not an approval.</h1>
+<p>Watch a generated patch and linked check reach separate local approval gates.
+The fixture-only recorder typed both displayed codes; ordinary demo use remains manual.
+The replay preserves actual output and timing. Only the generated directory path is redacted.</p>
+<button id="play" type="button">Play recording</button>
+<button id="full" type="button">Show full transcript</button>
+<pre id="terminal" tabindex="0" aria-label="Recorded terminal output"></pre>
+<p>Validated before saving: exit 0, two toy approvals, final PASS, and original greeting unchanged.
+This is not remote Hermes, tunnel, real-workspace, or sandbox validation. Approved check code
+still runs with the local user's host and network access.</p>
+<p><a href="assets/local-demo.cast" download>Download actual cast</a> ·
+<a href="TRY_IT.md">Run the walkthrough</a></p></main>
+<script>
+const events=[[0.051, "o", "Hermes Local Hands - LOCAL DEMO\r\nThis creates a toy repository and private state. No network or Hermes is used.\r\nEach patch/check still needs its own local approval.\r\nDemo files retained at: \"\u003cgenerated-demo-directory>\"\r\n"], [0.124, "o", "\r\n1/3 - Read one allowed file and propose a change.\r\n"], [0.124, "o", "Original greeting: \"Hello from Hermes.\\n\"\r\n"], [0.195, "o", "The proposal is pending. It has not changed the original repository.\r\n"], [0.196, "o", "Hermes Local Hands - LOCAL REQUEST REVIEW\r\nrequest_id: r_kBzN_z8Zh_Zm7werF5TEDw\r\nkind: patch\r\n"], [0.196, "o", "workspace_id: demo\r\nstate: pending\r\nclient_id: demo-client\r\ncreated_at: 2026-09-12T06:39:43.798899+00:00\r\nexpires_at: 2026-09-12T06:54:43.798899+00:00\r\nbase_head: 5ea7f8d1c4c60265b32ee769a336a7029b59d171\r\npolicy_hash: 6e644573d741c5929b4bfbc8cfcd4e3baf9dbdda3a83e959c5d4689dac3fc736\r\n"], [0.196, "o", "payload_metadata:\r\n"], [0.196, "o", "{\r\n  \"affected_paths\": [\r\n    \"src/greeting.txt\"\r\n  ],\r\n  \"changed_lines\": 2,\r\n  \"patch_bytes\": 103,\r\n  \"patch_sha256\": \"43b95655dece84b8c497be4069b7fb1172bcc6dd6b503092f23bf3909a054380\"\r\n}\r\n----- BEGIN UNTRUSTED PATCH (each line prefixed with '| ') -----\r\n| --- a/src/greeting.txt\r\n| +++ b/src/greeting.txt\r\n"], [0.196, "o", "| @@ -1 +1 @@\r\n| -Hello from Hermes.\r\n| +Hello from Local Hands.\r\n| \r\n----- END UNTRUSTED PATCH -----\r\napproval_code: 2CE120BE64F3\r\nApprove only after reviewing the complete delimited request above.\r\nType this request's approval_code, or press Enter to stop: "], [2.2, "o", "2CE120BE64F3\r\n"], [2.554, "o", "Patch verified in its snapshot. The original repository is unchanged.\r\n\r\n2/3 - Review a check against that exact approved patch.\r\nThis fixed check reads only the toy greeting and compares its text.\r\nReal check profiles execute as your local user; they are not sandboxed.\r\nCheck program: \"from pathlib import Path; actual = Path('src/greeting.txt').read_text(encoding='utf-8'); print('Greeting matches the reviewed patch.' if actual == 'Hello from Local Hands.\\\\n' else 'Greeting did not match.'); raise SystemExit(0 if actual == 'Hello from Local Hands.\\\\n' else 1)\"\r\n"], [2.6, "o", "Hermes Local Hands - LOCAL REQUEST REVIEW\r\nrequest_id: r_KAtRrZC9xsv8C_1nyaoPRg\r\nkind: test\r\nworkspace_id: demo\r\nstate: pending\r\nclient_id: demo-client\r\ncreated_at: 2026-09-12T06:39:46.203344+00:00\r\nexpires_at: 2026-09-12T06:54:46.203344+00:00\r\nbase_head: 5ea7f8d1c4c60265b32ee769a336a7029b59d171\r\n"], [2.6, "o", "policy_hash: 6e644573d741c5929b4bfbc8cfcd4e3baf9dbdda3a83e959c5d4689dac3fc736\r\npayload_metadata:\r\n"], [2.6, "o", "{\r\n  \"patch_request_id\": \"r_kBzN_z8Zh_Zm7werF5TEDw\",\r\n  \"profile\": \"greeting\",\r\n  \"timeout_seconds\": 10\r\n}\r\n"], [2.6, "o", "approval_code: 245330DD1C9E\r\nApprove only after reviewing the complete delimited request above.\r\n"], [2.6, "o", "Type this request's approval_code, or press Enter to stop: "], [4.605, "o", "245330DD1C9E\r\n"], [4.856, "o", "Check passed. Remote status exposes metadata; captured check output stays local.\r\n\r\n3/3 - Verify the retained receipt chain and original repository.\r\n"], [4.858, "o", "PASS: approved patch + linked check + receipt verification; original unchanged.\r\nThis was a local demo, not a two-machine, Hermes, or sandbox validation.\r\nNext: follow docs/TRY_IT.md to configure your real two-machine workflow.\r\n"]];
+const terminal=document.getElementById('terminal');
+let timers=[];
+function clearTimers(){timers.forEach(clearTimeout);timers=[];}
+function append(value){terminal.textContent+=value.replace(/\r/g,'');
+terminal.scrollTop=terminal.scrollHeight;}
+document.getElementById('play').onclick=()=>{clearTimers();terminal.textContent='';
+for(const [at,type,value] of events)
+if(type==='o') timers.push(setTimeout(()=>append(value),at*1000));};
+document.getElementById('full').onclick=()=>{clearTimers();terminal.textContent='';
+for(const [,type,value] of events) if(type==='o') append(value);};
+terminal.textContent='Select Play recording. No command will run in your browser.';
+</script></html>
