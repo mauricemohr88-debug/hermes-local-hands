@@ -19,7 +19,7 @@ specific read/request boundary. It is not another Hermes runtime, a general
 remote shell, or an autonomous deployment service. The remote protocol cannot
 approve requests, write the active checkout, merge, or push.
 
-> **Security boundary in v0.1.** `workspace_status` and `read_file` are remote
+> **Security boundary.** `workspace_status` and `read_file` are remote
 > inspection tools. `propose_patch` and `request_check` only create a pending,
 > expiring request. Approval and rejection are local-operator actions. Local
 > Hands applies patches and launches checks from an isolated snapshot rather
@@ -52,17 +52,17 @@ can skip or abort; piped/noninteractive input is refused, never auto-approved.
 
 The demo keeps its generated files for inspection and prints their directory.
 This is a local example of request → review → snapshot result, **not a
-two-machine test or a sandbox**. Follow the [short walkthrough](docs/TRY_IT.md)
+two-machine test or a sandbox**. Follow the [short walkthrough](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/docs/TRY_IT.md)
 for what to inspect, read-only diagnostics, and the separate two-machine setup.
 
-![Recorded CLI output of the local toy demo: separate patch and check approvals, followed by a snapshot result](docs/assets/local-demo.gif)
+![Recorded CLI output of the local toy demo: separate patch and check approvals, followed by a snapshot result](https://raw.githubusercontent.com/mauricemohr88-debug/hermes-local-hands/main/docs/assets/local-demo.gif)
 
 This is an actual recording captured during development of 0.2.0; its
 pre-release label describes when it was recorded. The
 fixture-only recorder entered the two displayed toy codes; ordinary demo use
 remains manual. The generated directory path is redacted. Download the
-[cast](docs/assets/local-demo.cast) or open the self-contained
-[replay page](docs/demo.html) locally for the full transcript and timing. The GIF
+[cast](https://raw.githubusercontent.com/mauricemohr88-debug/hermes-local-hands/main/docs/assets/local-demo.cast) or download the self-contained
+[replay page](https://raw.githubusercontent.com/mauricemohr88-debug/hermes-local-hands/main/docs/demo.html) and open it locally for the full transcript and timing. The GIF
 holds its final frame briefly for readability; no remote connection was tested.
 
 ## What it does — and does not do
@@ -89,7 +89,7 @@ for requests and operator decisions.
 
 ## Connect a real repository
 
-Complete the [local demo](docs/TRY_IT.md#1-run-the-local-demo) first if the
+Complete the [local demo](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/docs/TRY_IT.md#1-run-the-local-demo) first if the
 approval/snapshot distinction is new to you. Only register a repository and
 check profiles you trust: approved check code has your normal host and network
 access. Start with a non-sensitive test repository, not production code.
@@ -158,7 +158,7 @@ Source-checkout users can inspect setup without changing it:
 
 Diagnostics do not initialize or repair state, approve requests, execute check
 profiles, or prove a remote Hermes connection. See the
-[diagnostic examples](docs/TRY_IT.md#2-check-your-local-setup-read-only).
+[diagnostic examples](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/docs/TRY_IT.md#2-check-your-local-setup-read-only).
 
 ### End-to-end workflow
 
@@ -331,7 +331,7 @@ public Internet.
   for these internal markers; repeated build failures require a reviewed
   recovery/migration rather than manual deletion while evidence matters.
 
-Read [THREAT_MODEL.md](THREAT_MODEL.md) and [SECURITY.md](SECURITY.md) before
+Read [THREAT_MODEL.md](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/THREAT_MODEL.md) and [SECURITY.md](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/SECURITY.md) before
 using it with sensitive repositories.
 
 ## Development validation
@@ -355,7 +355,7 @@ patch, local approval, snapshot application, a linked check, and receipt-chain
 verification. This is evidence for that exact environment only; it is not a
 general compatibility, availability, or production-security claim.
 
-For a durable local service setup, see [docs/SERVICE.md](docs/SERVICE.md).
+For a durable local service setup, see [docs/SERVICE.md](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/docs/SERVICE.md).
 
 ## Project direction
 
@@ -365,14 +365,14 @@ revenue must not be inferred from a release or a successful local demo.
 
 We are looking for **two independent split-machine testers**. Try one small,
 non-sensitive workflow and report the first confusing step using the
-[feedback template](docs/TRY_IT.md#4-report-what-actually-happened). No call,
+[feedback template](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/docs/TRY_IT.md#4-report-what-actually-happened). No call,
 payment, or private repository upload is needed. A failed setup is useful
 feedback too; the invitation is not evidence that two testers have completed it.
 
 Only actual, repeated use should justify an optional convenience layer, such as
 a local approval inbox or later H3rm35 mobile approval support. H3rm35 is a
 separate project, not a requirement or a completed integration. See
-[ROADMAP.md](ROADMAP.md) for the evidence gates.
+[ROADMAP.md](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/ROADMAP.md) for the evidence gates.
 
 ### Related upstream context
 
@@ -388,14 +388,14 @@ Hands.
 
 ## Contributing and security
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development expectations and
-[SECURITY.md](SECURITY.md) for private vulnerability reporting. Never put
+See [CONTRIBUTING.md](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/CONTRIBUTING.md) for development expectations and
+[SECURITY.md](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/SECURITY.md) for private vulnerability reporting. Never put
 credentials, private source, or real action receipts in a public issue or pull
 request.
 
 ## License
 
-Released under the [MIT License](LICENSE).
+Released under the [MIT License](https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/LICENSE).
 
 Hermes Local Hands is an independent community project and is not affiliated
 with or endorsed by Nous Research.

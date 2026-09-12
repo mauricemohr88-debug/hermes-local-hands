@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.1 - 2026-09-12
+
+- Use absolute GitHub documentation and raw asset URLs in the package README
+  so links and the recorded demo image resolve correctly when viewed on PyPI.
+- Add regression coverage for relative Markdown and HTML link/image targets in
+  the README selected by package metadata. No runtime behavior or dependencies
+  change.
+
 ## 0.2.0 - 2026-09-12
 
 - Add a `demo` command with a generated toy Git repository and
