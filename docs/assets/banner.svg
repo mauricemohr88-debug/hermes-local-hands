@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="340" viewBox="0 0 1280 340" role="img" aria-label="Hermes Local Hands: Hermes runs on one computer, your repository stays on another, you approve changes where the code lives">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#140b05"/>
+      <stop offset="0.6" stop-color="#2a170b"/>
+      <stop offset="1" stop-color="#3f2410"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.5" r="0.4">
+      <stop offset="0" stop-color="#ffb454" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#ffb454" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="warm" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff3e2"/>
+      <stop offset="1" stop-color="#ffc98a"/>
+    </linearGradient>
+    <marker id="head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#e8964a"/>
+    </marker>
+    <clipPath id="card"><rect width="1280" height="340" rx="24"/></clipPath>
+  </defs>
+
+  <g clip-path="url(#card)">
+    <rect width="1280" height="340" fill="url(#bg)"/>
+    <rect width="1280" height="340" fill="url(#glow)"/>
+    <!-- faint grid: the two machines sit on separate networks -->
+    <g stroke="#ffb454" stroke-opacity="0.06">
+      <path d="M0 85 H1280 M0 170 H1280 M0 255 H1280"/>
+      <path d="M160 0 V340 M320 0 V340 M480 0 V340 M640 0 V340 M800 0 V340 M960 0 V340 M1120 0 V340"/>
+    </g>
+
+    <!-- title -->
+    <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+      <text x="64" y="112" font-size="62" font-weight="800" fill="url(#warm)">Hermes Local Hands</text>
+      <text x="66" y="166" font-size="27" font-weight="600" fill="#ffe3c2">Hermes runs on one computer.</text>
+      <text x="66" y="202" font-size="27" font-weight="600" fill="#ffe3c2">Your repository stays on another.</text>
+      <text x="66" y="238" font-size="27" font-weight="600" fill="#ffb454">You approve changes where the code lives.</text>
+    </g>
+    <text x="66" y="290" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="18" fill="#d9a56f">read · propose · request → approve locally → run in a snapshot</text>
+
+    <!-- remote machine: Hermes -->
+    <g transform="translate(760 92)">
+      <rect width="130" height="38" rx="8" fill="#2f1b0d" stroke="#e8964a" stroke-width="2"/>
+      <rect y="46" width="130" height="38" rx="8" fill="#2f1b0d" stroke="#e8964a" stroke-width="2"/>
+      <rect y="92" width="130" height="38" rx="8" fill="#2f1b0d" stroke="#e8964a" stroke-width="2"/>
+      <g fill="#ffb454"><circle cx="18" cy="19" r="4"/><circle cx="18" cy="65" r="4"/><circle cx="18" cy="111" r="4"/></g>
+      <g stroke="#7a4a24" stroke-width="3" stroke-linecap="round"><path d="M40 19 H112 M40 65 H112 M40 111 H112"/></g>
+      <text x="65" y="162" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#ffd9ad">remote Hermes</text>
+    </g>
+
+    <!-- requests go out; allowlisted reads and request status come back, never check output -->
+    <path d="M902 132 C960 112, 1000 112, 1056 132" fill="none" stroke="#e8964a" stroke-width="2.5" stroke-dasharray="7 6" marker-end="url(#head)"/>
+    <text x="979" y="104" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#d9a56f">request</text>
+    <path d="M1056 212 C1000 232, 960 232, 902 212" fill="none" stroke="#8a5a32" stroke-width="2" stroke-dasharray="4 6" marker-end="url(#head)"/>
+    <text x="979" y="254" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="14" fill="#a87a50">reads · status</text>
+
+    <!-- approval gate -->
+    <g transform="translate(979 172)">
+      <circle r="30" fill="#ffb454"/>
+      <circle r="30" fill="none" stroke="#fff3e2" stroke-width="2" stroke-opacity="0.6"/>
+      <path d="M-13 1 L-4 10 L14 -9" fill="none" stroke="#2a170b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+
+    <!-- local machine: your repository -->
+    <g transform="translate(1066 104)">
+      <rect width="150" height="100" rx="10" fill="#2f1b0d" stroke="#ffb454" stroke-width="2.5"/>
+      <rect x="10" y="10" width="130" height="80" rx="4" fill="#1c1008"/>
+      <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+        <text x="20" y="34" fill="#ffb454">git status</text>
+        <text x="20" y="56" fill="#d9a56f">+ fix.patch</text>
+        <text x="20" y="78" fill="#7fd18b">✓ approved</text>
+      </g>
+      <path d="M-14 106 H164 L150 120 H0 Z" fill="#4a2b14" stroke="#ffb454" stroke-width="2"/>
+      <text x="75" y="150" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" fill="#ffd9ad">your repository</text>
+    </g>
+  </g>
+</svg>

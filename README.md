@@ -1,11 +1,17 @@
-# Hermes Local Hands
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mauricemohr88-debug/hermes-local-hands/main/docs/assets/banner.svg" alt="Hermes Local Hands: Hermes runs on one computer. Your repository stays on another. You approve changes where the code lives." width="100%">
+</p>
 
-[![CI](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/ci.yml/badge.svg)](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml/badge.svg)](https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml)
-[![PyPI](https://img.shields.io/pypi/v/hermes-local-hands.svg)](https://pypi.org/project/hermes-local-hands/)
+<p align="center">
+  <a href="https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml"><img alt="CodeQL" src="https://github.com/mauricemohr88-debug/hermes-local-hands/actions/workflows/codeql.yml/badge.svg"></a>
+  <a href="https://pypi.org/project/hermes-local-hands/"><img alt="PyPI" src="https://img.shields.io/pypi/v/hermes-local-hands?style=flat-square&color=e8964a"></a>
+  <img alt="status: alpha" src="https://img.shields.io/badge/status-alpha-ffb454?style=flat-square">
+  <img alt="Python 3.11+" src="https://img.shields.io/badge/python-3.11%2B-7a4a24?style=flat-square">
+  <a href="https://github.com/mauricemohr88-debug/hermes-local-hands/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-2a170b?style=flat-square"></a>
+</p>
 
-**Hermes runs on one computer. Your repository stays on another. You approve
-changes where the code lives.**
+<p align="center"><b>Hermes runs on one computer. Your repository stays on another.<br>You approve changes where the code lives.</b></p>
 
 Hermes Local Hands is an **alpha**, free, open-source companion for a remote
 [Hermes](https://github.com/NousResearch/hermes-agent) agent. For example, Hermes
@@ -66,6 +72,22 @@ remains manual. The generated directory path is redacted. Download the
 holds its final frame briefly for readability; no remote connection was tested.
 
 ## What it does — and does not do
+
+```mermaid
+sequenceDiagram
+    participant H as Remote Hermes
+    participant L as Local Hands (your machine)
+    participant Y as You
+    H->>L: workspace_status, read_file (allowlist only)
+    H->>L: propose_patch / request_check
+    L-->>H: pending request, expires soon
+    L->>Y: show the request and its approval code
+    Y->>L: approve or reject (locally only)
+    L->>L: apply the patch and run the check in a snapshot
+    Note over L: no merge into your checkout, no push.<br/>Approved check code still has normal host access.
+    H->>L: request_status
+    L-->>H: bounded metadata, never the check output
+```
 
 | Capability | Remote Hermes can do it | Local operator must do it |
 | --- | --- | --- |
