@@ -175,6 +175,59 @@ async def _exercise_mcp(tmp_path: Path) -> None:
                     assert "output" not in check_status.structured_content["result"]
                     assert "output_excerpt" not in check_status.structured_content["result"]
                     assert "mcp check" not in str(check_status.structured_content)
+
+            # The server uses stateless HTTP, including for legacy protocol clients.
+            # Exercise individual requests without following redirects or a session ID.
+            headers = {
+                "Accept": "application/json, text/event-stream",
+                "MCP-Protocol-Version": "2025-11-25",
+            }
+            initialize = await authenticated_client.post(
+                endpoint,
+                headers=headers,
+                follow_redirects=False,
+                json={
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "initialize",
+                    "params": {
+                        "protocolVersion": "2025-11-25",
+                        "capabilities": {},
+                        "clientInfo": {"name": "legacy-regression", "version": "1.0"},
+                    },
+                },
+            )
+            assert initialize.status_code == 200
+            assert "mcp-session-id" not in initialize.headers
+            assert initialize.json()["result"]["serverInfo"]["name"] == "hermes-local-hands"
+
+            initialized_notification = await authenticated_client.post(
+                endpoint,
+                headers=headers,
+                follow_redirects=False,
+                json={"jsonrpc": "2.0", "method": "notifications/initialized"},
+            )
+            assert initialized_notification.status_code == 202
+
+            listing = await authenticated_client.post(
+                endpoint,
+                headers=headers,
+                follow_redirects=False,
+                json={"jsonrpc": "2.0", "id": 2, "method": "tools/list", "params": {}},
+            )
+            assert listing.status_code == 200
+            assert "mcp-session-id" not in listing.headers
+            assert len(listing.json()["result"]["tools"]) == 5
+
+            assert service.revoke_client("mcp-e2e")
+            denied = await authenticated_client.post(
+                endpoint,
+                headers=headers,
+                follow_redirects=False,
+                json={"jsonrpc": "2.0", "id": 3, "method": "tools/list", "params": {}},
+            )
+            assert denied.status_code == 401
+            assert denied.headers["www-authenticate"] == "Bearer"
     finally:
         server.should_exit = True
         await serve_task
